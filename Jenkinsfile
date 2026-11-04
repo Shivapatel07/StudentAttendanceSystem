@@ -6,25 +6,32 @@ pipeline {
         nodejs 'Node24'
     }
 
+    environment {
+        DOCKER_PATH = 'C:/Program Files/Docker/Docker/resources/bin'
+    }
+
     stages {
 
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/Shivapatel07/StudentAttendanceSystem.git'
+                checkout scm
             }
         }
 
-        stage('Check Node and npm') {
+        stage('Check Environment') {
             steps {
                 bat 'node --version'
                 bat 'npm --version'
+                bat 'python --version'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                bat 'npm ci'
+                bat '''
+                    npm config set msvs_version 2022
+                    npm ci
+                '''
             }
         }
 
@@ -34,20 +41,24 @@ pipeline {
             }
         }
 
-        stage('Build Complete') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Student Attendance System CI Pipeline Completed Successfully!'
+                bat '''
+                    set "PATH=%DOCKER_PATH%;%PATH%"
+                    docker --version
+                    docker build -t student-attendance-system:latest .
+                '''
             }
         }
     }
 
     post {
         success {
-            echo 'SUCCESS: Jenkins pipeline completed.'
+            echo 'Student Attendance System pipeline completed successfully!'
         }
 
         failure {
-            echo 'FAILED: Check the Jenkins Console Output.'
+            echo 'Pipeline failed. Check Console Output.'
         }
     }
 }
