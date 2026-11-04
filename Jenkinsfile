@@ -31,8 +31,8 @@ pipeline {
             steps {
                 bat '''
                     set "PATH=C:\\Program Files\\Python313;%PATH%"
-                    set "npm_config_python=%PYTHON%"
-                    npm config set msvs_version 2022
+                    set "PYTHON=C:\\Program Files\\Python313\\python.exe"
+                    set "GYP_MSVS_VERSION=2022"
                     npm ci
                 '''
             }
