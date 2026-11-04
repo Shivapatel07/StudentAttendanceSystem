@@ -2,15 +2,6 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'Node24'
-    }
-
-    environment {
-        PYTHON = 'C:\\Program Files\\Python313\\python.exe'
-        DOCKER_PATH = 'C:\\Program Files\\Docker\\Docker\\resources\\bin'
-    }
-
     stages {
 
         stage('Checkout') {
@@ -19,23 +10,16 @@ pipeline {
             }
         }
 
-        stage('Check Environment') {
+        stage('Check Node and npm') {
             steps {
                 bat 'node --version'
                 bat 'npm --version'
-                bat '"%PYTHON%" --version'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                bat '''
-                    @echo off
-                    set "PATH=C:\\Program Files\\Python313;%PATH%"
-                    set "PYTHON=C:\\Program Files\\Python313\\python.exe"
-                    set "GYP_MSVS_VERSION=2022"
-                    npm ci
-                '''
+                bat 'npm ci'
             }
         }
 
@@ -49,33 +33,8 @@ pipeline {
             steps {
                 bat '''
                     @echo off
-
-                    set "DOCKER_EXE="
-
-                    if exist "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" (
-                        set "DOCKER_EXE=C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe"
-                    )
-
-                    if not defined DOCKER_EXE if exist "C:\\Program Files\\Docker\\Docker\\resources\\docker.exe" (
-                        set "DOCKER_EXE=C:\\Program Files\\Docker\\Docker\\resources\\docker.exe"
-                    )
-
-                    if not defined DOCKER_EXE if exist "C:\\Users\\Administrator\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" (
-                        set "DOCKER_EXE=C:\\Users\\Administrator\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe"
-                    )
-
-                    if not defined DOCKER_EXE (
-                        echo ERROR: Docker CLI was not found.
-                        echo Install Docker Desktop or configure its correct executable path.
-                        exit /b 1
-                    )
-
-                    echo Docker executable found:
-                    echo %DOCKER_EXE%
-
-                    "%DOCKER_EXE%" --version
-
-                    "%DOCKER_EXE%" build -t student-attendance-system:latest .
+                    docker --version
+                    docker build -t student-attendance-system:latest .
                 '''
             }
         }
@@ -83,11 +42,15 @@ pipeline {
 
     post {
         success {
-            echo 'SUCCESS: Student Attendance System pipeline completed!'
+            echo 'All pipeline stages completed successfully!'
         }
 
         failure {
-            echo 'FAILURE: Check the Jenkins Console Output for details.'
+            echo 'Pipeline failed. Check Jenkins Console Output.'
+        }
+
+        always {
+            echo 'Jenkins pipeline execution completed.'
         }
     }
 }
