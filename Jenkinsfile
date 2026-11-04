@@ -7,7 +7,8 @@ pipeline {
     }
 
     environment {
-        DOCKER_PATH = 'C:/Program Files/Docker/Docker/resources/bin'
+        PYTHON = 'C:\\Program Files\\Python313\\python.exe'
+        DOCKER_PATH = 'C:\\Program Files\\Docker\\Docker\\resources\\bin'
     }
 
     stages {
@@ -22,13 +23,15 @@ pipeline {
             steps {
                 bat 'node --version'
                 bat 'npm --version'
-                bat 'python --version'
+                bat '"%PYTHON%" --version'
             }
         }
 
         stage('Install Dependencies') {
             steps {
                 bat '''
+                    set "PATH=C:\\Program Files\\Python313;%PATH%"
+                    set "npm_config_python=%PYTHON%"
                     npm config set msvs_version 2022
                     npm ci
                 '''
