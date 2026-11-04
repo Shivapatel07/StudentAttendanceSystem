@@ -10,7 +10,15 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main',
+                    url: 'https://github.com/Shivapatel07/StudentAttendanceSystem.git'
+            }
+        }
+
+        stage('Check Node and npm') {
+            steps {
+                bat 'node --version'
+                bat 'npm --version'
             }
         }
 
@@ -20,7 +28,7 @@ pipeline {
             }
         }
 
-        stage('Run Automated Tests') {
+        stage('Run Tests') {
             steps {
                 bat 'npm test'
             }
@@ -28,18 +36,18 @@ pipeline {
 
         stage('Build Complete') {
             steps {
-                echo 'Student Attendance System build completed!'
+                echo 'Student Attendance System CI Pipeline Completed Successfully!'
             }
         }
     }
 
     post {
         success {
-            echo 'Jenkins pipeline executed successfully!'
+            echo 'SUCCESS: Jenkins pipeline completed.'
         }
 
         failure {
-            echo 'Jenkins pipeline failed. Check Console Output.'
+            echo 'FAILED: Check the Jenkins Console Output.'
         }
     }
 }
